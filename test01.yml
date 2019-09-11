@@ -1,0 +1,34 @@
+---
+- name: "PLAY01 - My main play book "
+  hosts: ios_router
+  tasks:
+    - name: "TASK01 - Test variables"
+      ios_config:
+        #backup: yes
+        #src: "templates/ntp_config.j2"
+        lines:
+          - description Ansible test
+        parents:
+          - interface GigabitEthernet2
+      notify: cfg_was_updated
+      register: module_update
+    - debug:
+        var: module_update
+  
+    - name: "TASK02 - Show running-config"
+      ios_command:
+        commands:
+          - show run
+      register: config
+    - name: "TASK03 - Copy config"
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "backup/{{ inventory_hostname }}.txt"
+
+  handlers:
+    #- name: cfg_was_updated
+    - name: "HANDLERS01 - Check updates"
+      listen: cfg_was_updated
+      debug:
+        #var: ntp_updates.updates
+        var: module_update

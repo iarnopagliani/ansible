@@ -1,0 +1,19 @@
+---
+# name is optional but BP
+- name: "PLAY01 - My main play book"
+  hosts: ios_router
+  gather_facts: no
+
+  tasks:
+    - name: "GATHERING FACTS"
+      ios_facts:
+        gather_subset: hardware
+      register: hw_var
+    - name: "Devices without version 16.08.01a"
+      debug:
+        var: ansible_net_version
+      when: ansible_net_version != "16.08.01a"
+    - name: "Devices without version 16.08.01a"
+      debug:
+        var: hw_var
+      when: hw_var is defined
